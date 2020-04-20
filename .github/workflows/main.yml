@@ -1,0 +1,17 @@
+on: [pull_request]
+name: gitumldiagramweb CI
+jobs:
+  checks:
+    name: run
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout master
+        uses: actions/checkout@master
+
+      - name: checking makefile
+        run: cat -e -t -v Makefile
+
+      - name: Runnig process quality tests
+        uses: cedrickring/golang-action@1.4.1
+        with:
+          args: make run-pipeline
