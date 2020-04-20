@@ -11,7 +11,7 @@ func TestManager_AddPool(t *testing.T) {
 		pools := make(map[string]*goworkerpool.Pool,1)
 	//}
 	type args struct {
-		poolId         string
+		poolID         string
 		initialWorkers int
 		maxJobsInQueue int
 		verbose        bool
@@ -24,7 +24,7 @@ func TestManager_AddPool(t *testing.T) {
 		{
 			"Adds slow processing queue",
 			args{
-				poolId:         "slowProcessing",
+				poolID:         "slowProcessing",
 				initialWorkers: 2,
 				maxJobsInQueue: 2,
 				verbose:        false,
@@ -34,7 +34,7 @@ func TestManager_AddPool(t *testing.T) {
 		{
 			"Adds a queue with an existing queueId must fail",
 			args{
-				poolId:         "slowProcessing",
+				poolID:         "slowProcessing",
 				initialWorkers: 2,
 				maxJobsInQueue: 2,
 				verbose:        false,
@@ -44,7 +44,7 @@ func TestManager_AddPool(t *testing.T) {
 		{
 			"Returns error when pool with empty id tried to be created",
 			args{
-				poolId:         "",
+				poolID:         "",
 				initialWorkers: 2,
 				maxJobsInQueue: 2,
 				verbose:        false,
@@ -54,7 +54,7 @@ func TestManager_AddPool(t *testing.T) {
 		{
 			"Returns error when pool with empty tasks queue tried to bre created",
 			args{
-				poolId:         "processQueue",
+				poolID:         "processQueue",
 				initialWorkers: 2,
 				maxJobsInQueue: 0,
 				verbose:        false,
@@ -68,7 +68,7 @@ func TestManager_AddPool(t *testing.T) {
 			manager := &Manager{
 				pools: pools,
 			}
-			got := manager.AddPool(tt.args.poolId, tt.args.initialWorkers, tt.args.maxJobsInQueue, tt.args.verbose);
+			got := manager.AddPool(tt.args.poolID, tt.args.initialWorkers, tt.args.maxJobsInQueue, tt.args.verbose);
 			if got == nil && tt.want != nil {
 				t.Errorf("AddPool() = %v, want %v", got, tt.want)
 			}
@@ -101,7 +101,7 @@ func TestManager_SetFunc(t *testing.T) {
 		pools map[string]*goworkerpool.Pool
 	}
 	type args struct {
-		poolId     string
+		poolID     string
 		workerFunc goworkerpool.PoolFunc
 	}
 	tests := []struct {
@@ -136,7 +136,7 @@ func TestManager_SetFunc(t *testing.T) {
 			manager = &Manager{
 				pools: tt.fields.pools,
 			}
-			if err := manager.SetFunc(tt.args.poolId, tt.args.workerFunc); (err != nil) != tt.wantErr {
+			if err := manager.SetFunc(tt.args.poolID, tt.args.workerFunc); (err != nil) != tt.wantErr {
 				t.Errorf("SetFunc() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
