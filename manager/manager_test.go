@@ -1,14 +1,16 @@
 package manager
 
 import (
+	"fmt"
 	"github.com/enriquebris/goworkerpool"
 	"github.com/pkg/errors"
+	"go-workers-multipool/pool"
 	"testing"
 )
 
 func TestManager_AddPool(t *testing.T) {
 	//type fields struct {
-		pools := make(map[string]*goworkerpool.Pool,1)
+		pools := make(map[string]pool.Descriptor,1)
 	//}
 	type args struct {
 		poolID         string
@@ -81,7 +83,7 @@ func TestManager_AddPool(t *testing.T) {
 
 func TestManager_VerifyAddedPool(t *testing.T) {
 	newManager := Manager{
-					pools: make(map[string]*goworkerpool.Pool,1),
+					pools: make(map[string]pool.Descriptor,1),
 				}
 	if newManager.AddPool("slowProcessing", 2, 2, false) != nil {
 		t.Fatalf("AddPool has failed creating the new pool")
@@ -92,13 +94,13 @@ func TestManager_VerifyAddedPool(t *testing.T) {
 }
 
 func TestManager_SetFunc(t *testing.T) {
-	pools := make(map[string]*goworkerpool.Pool,1)
+	pools := make(map[string]pool.Descriptor,1)
 	manager := &Manager{
 		pools: pools,
 	}
 	manager.AddPool("slowProcessing", 2, 2, false)
 	type fields struct {
-		pools map[string]*goworkerpool.Pool
+		pools map[string]pool.Descriptor
 	}
 	type args struct {
 		poolID     string
@@ -122,7 +124,7 @@ func TestManager_SetFunc(t *testing.T) {
 		},
 		{
 			"Fails setting function for a non existing pool",
-			fields{make(map[string]*goworkerpool.Pool)},
+			fields{make(map[string]pool.Descriptor)},
 			args{"slowProcessing",
 				func(data interface{}) bool {
 					return true
@@ -143,11 +145,228 @@ func TestManager_SetFunc(t *testing.T) {
 	}
 }
 
-func TestManager_SetFuncExecution(t *testing.T) {
-	pools := make(map[string]*goworkerpool.Pool,1)
+func TestManager_SetFuncForPool(t *testing.T) {
+	pools := make(map[string]pool.Descriptor,1)
 	manager := &Manager{
 		pools: pools,
 	}
 	manager.AddPool("slowProcessing", 2, 2, false)
+    poolMock := &pool.GoWorkerPoolDefinerMock{}
+    manager.pools["slowProcessing"] = poolMock
+	manager.SetFunc("slowProcessing", func(i interface{}) bool {
+		fmt.Println("executing function")
+		return true
+	})
+    if !poolMock.SetWorkerFuncHasBeenCalled {
+    	t.Fatal("SetWorkerFunc has not been set correctly")
+	}
 
+}
+
+func TestManager_AddTask(t *testing.T) {
+	pools := make(map[string]pool.Descriptor,1)
+	manager := &Manager{
+		pools: pools,
+	}
+	manager.AddPool("slowProcessing", 2, 2, false)
+	type fields struct {
+		pools map[string]pool.Descriptor
+	}
+	type args struct {
+		poolID string
+		data   interface{}
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			"Returns error if poolID id is empty",
+			fields{pools:make(map[string]pool.Descriptor,1)},
+			args{poolID:"",data:"testdata"},
+			true,
+		},
+		{
+			"Returns error if does not exist a pool with poolID id",
+			fields{pools:make(map[string]pool.Descriptor,1)},
+			args{poolID:"nonExistingId",data:"testdata"},
+			true,
+		},
+		{
+			"Returns error if data is nil",
+			fields{pools:manager.pools},
+			args{poolID:"slowProcessing",data:nil},
+			true,
+		},
+		{
+			"Does not return error if data is as expected",
+			fields{pools:manager.pools},
+			args{poolID:"slowProcessing",data: struct {
+				testField string
+			}{
+				"filledField",
+			}},
+			false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			manager := &Manager{
+				pools: tt.fields.pools,
+			}
+			if err := manager.AddTaskToPool(tt.args.poolID, tt.args.data); (err != nil) != tt.wantErr {
+				t.Errorf("AddTaskToPool() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestManager_AddTaskToPool(t *testing.T) {
+	pools := make(map[string]pool.Descriptor,1)
+	manager := &Manager{
+		pools: pools,
+	}
+	manager.AddPool("slowProcessing", 2, 2, false)
+	poolMock := &pool.GoWorkerPoolDefinerMock{}
+	manager.pools["slowProcessing"] = poolMock
+	manager.AddTaskToPool("slowProcessing", "task test")
+	if !poolMock.AddTaskFuncHasBeenCalled {
+		t.Error()
+	}
+}
+
+func TestManager_AddWorkers(t *testing.T) {
+	pools := make(map[string]pool.Descriptor,1)
+	manager := &Manager{
+		pools: pools,
+	}
+	manager.AddPool("slowProcessing", 2, 2, false)
+	type fields struct {
+		pools map[string]pool.Descriptor
+	}
+	type args struct {
+		poolID        string
+		workersAmount int
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			"Returns error if {poolID} id is empty",
+			fields{pools: make(map[string]pool.Descriptor, 1)},
+			 args{poolID: "", workersAmount: 1},
+			 true,
+		},
+		{
+			"Returns error if the added workers amount is 0",
+			fields{pools: make(map[string]pool.Descriptor, 1)},
+			args{poolID: "poolTest", workersAmount: 0},
+			true,
+		},
+		{
+			"Returns error if pool does not exist with {poolId} id",
+			fields{pools: pools},
+			args{poolID: "poolTest", workersAmount: 2},
+			true,
+		},
+		{
+			"Success if pool with {poolId} id exists and workers amount is >= 1",
+			fields{pools: pools},
+			args{poolID: "slowProcessing", workersAmount: 2},
+			false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			manager := &Manager{
+				pools: tt.fields.pools,
+			}
+			if err := manager.AddWorkersToPool(tt.args.poolID, tt.args.workersAmount); (err != nil) != tt.wantErr {
+				t.Errorf("AddWorkersToPool() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestManager_AddWorkersToPool(t *testing.T) {
+	pools := make(map[string]pool.Descriptor,1)
+	manager := &Manager{
+		pools: pools,
+	}
+	manager.AddPool("slowProcessing", 2, 2, false)
+	poolMock := &pool.GoWorkerPoolDefinerMock{}
+	manager.pools["slowProcessing"] = poolMock
+	manager.AddWorkersToPool("slowProcessing", 2)
+	if !poolMock.AddWorkersHasBeenCalled {
+		t.Fail()
+	}
+}
+
+func TestManager_KillWorkers(t *testing.T) {
+	pools := make(map[string]pool.Descriptor,1)
+	manager := &Manager{
+		pools: pools,
+	}
+	manager.AddPool("slowProcessing", 2, 2, false)
+	type fields struct {
+		pools map[string]pool.Descriptor
+	}
+	type args struct {
+		poolID        string
+		workersAmount int
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			"Returns error if pool with {poolId} id does not exist",
+			fields{pools: pools},
+			args{poolID: "", workersAmount: 1},
+			true,
+		},
+		{
+			"Returns error if workers amount equals 0",
+			fields{pools: pools},
+			args{poolID: "slowProcessing", workersAmount: 0},
+			true,
+		},
+		{
+			"Success if pool exists and workers amount >= 1",
+			fields{pools: pools},
+			args{poolID: "slowProcessing", workersAmount: 2},
+			false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			manager := &Manager{
+				pools: tt.fields.pools,
+			}
+			if err := manager.KillWorkersFromPool(tt.args.poolID, tt.args.workersAmount); (err != nil) != tt.wantErr {
+				t.Errorf("KillWorkersFromPool() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestManager_KillWorkersFromPool(t *testing.T) {
+	pools := make(map[string]pool.Descriptor,1)
+	manager := &Manager{
+		pools: pools,
+	}
+	manager.AddPool("slowProcessing", 2, 2, false)
+	poolMock := &pool.GoWorkerPoolDefinerMock{}
+	manager.pools["slowProcessing"] = poolMock
+	manager.KillWorkersFromPool("slowProcessing", 2)
+	if !poolMock.KillWorkersHasBeenCalled {
+		t.Fail()
+	}
 }
