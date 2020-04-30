@@ -1,5 +1,5 @@
 on: [pull_request]
-name: gitumldiagramweb CI
+name: go-workers-multipool CI
 jobs:
   checks:
     name: run
