@@ -10,4 +10,4 @@ Current Features:
 
 System Overview:
 
-[system-overview](./go-workers-multipool-Overview.svg
+![system-overview](./go-workers-multipool-Overview.svg)
