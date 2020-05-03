@@ -6,42 +6,49 @@ import (
 )
 
 
-type GoWorkerPoolDefiner struct {
+type GoWorkerPoolAdapter struct {
 	*goworkerpool.Pool
 }
 
-func (definer *GoWorkerPoolDefiner) SetWorkerFunc(fn func(interface{})bool) {
+//SetWorkerFunc sets the function to be executed by the workers on this pool
+func (definer *GoWorkerPoolAdapter) SetWorkerFunc(fn func(interface{})bool) {
 	definer.Pool.SetWorkerFunc(fn)
 }
 
-func (definer *GoWorkerPoolDefiner) AddTask(data interface{}) error {
+//AddTask adds task to be executed
+func (definer *GoWorkerPoolAdapter) AddTask(data interface{}) error {
 	return definer.Pool.AddTask(data)
 }
 
-func (definer *GoWorkerPoolDefiner) AddWorkers(amount int) error {
+//AddWorkers adds workers on the fly to the pool
+func (definer *GoWorkerPoolAdapter) AddWorkers(amount int) error {
 	return definer.Pool.AddWorkers(amount)
 }
 
-func (definer *GoWorkerPoolDefiner) KillWorkers(amount int) error {
+//KillWorkers kills the desired amount of workers after they  finish their current job
+func (definer *GoWorkerPoolAdapter) KillWorkers(amount int) error {
 	if amount > definer.GetTotalWorkers() {
 		return errors.New("cannot kill an amount bigger than the existing workers")
 	}
 	return definer.Pool.KillWorkers(amount)
 }
 
-func (definer *GoWorkerPoolDefiner) EditWorkersAmount(workersAmount int) error {
+//EditWorkersAmount changes the amount of workers on the fly
+func (definer *GoWorkerPoolAdapter) EditWorkersAmount(workersAmount int) error {
 	return definer.Pool.SetTotalWorkers(workersAmount)
 }
 
-func (definer *GoWorkerPoolDefiner) PauseAllWorkers() {
+//PauseAllWorkers stops the workers from doing any work
+func (definer *GoWorkerPoolAdapter) PauseAllWorkers() {
 	definer.Pool.PauseAllWorkers()
 }
 
-func (definer *GoWorkerPoolDefiner) ResumeAllWorkers() {
+//ResumeAllWorkers puts workers to work after being paused
+func (definer *GoWorkerPoolAdapter) ResumeAllWorkers() {
 	definer.Pool.ResumeAllWorkers()
 }
 
-//WaitWhileAlive wait while there is at least one worker doing some work
-func (definer *GoWorkerPoolDefiner) WaitWhileAlive() error{
+//Wait wait while there is at least one worker doing some work
+func (definer *GoWorkerPoolAdapter) Wait() error{
 	return definer.Pool.Wait()
 }
