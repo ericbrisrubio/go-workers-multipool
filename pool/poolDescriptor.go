@@ -8,6 +8,6 @@ type Descriptor interface {
 	EditWorkersAmount(amount int) error
 	PauseAllWorkers()
 	ResumeAllWorkers()
-	WaitWhileAlive() error
+	Wait() error
 }
 
