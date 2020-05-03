@@ -9,11 +9,10 @@ You can easily have many pool to execute different tasks and manage them separat
 ### Example Use Case:
 System to resize images
 
-The system could use 2 different pools of workers, one to process low size images (< 5 MB), and a second
-pool to process the rest (> 5MBs). In that case the pool working on bigger images could have more workers
-doing the conversions. Since per the history, 70% of elements coming are bigger than 5 MB, and we want to do some
-extra work on them without affecting the conversion of the smaller ones.
-In case, at some point, we determine that we need only half of the current amount of workers converting big images,
+The system could use 2 different pools of workers, one to process low size images (< 5 MB), and a second pool to process 
+the rest (> 5 MB). Since per the history, 70% of elements coming are bigger than 5 MB, and we want to do some extra work 
+on them without affecting the conversion of the smaller ones, the pool for the bigger images could have more workers than 
+the other. If at some point, we determine that we need only half of the current amount of workers converting big images, 
 we can cut them in half on the fly without affecting anything else and without restarting the system.
 
 Current Features:
