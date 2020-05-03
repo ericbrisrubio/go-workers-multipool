@@ -7,3 +7,7 @@ https://github.com/enriquebris/goworkerpool
 Current Features:
 - Add a new pool to be managed
 - Define a function for the pool to be executed
+
+System Overview:
+
+[system-overview](./go-workers-multipool-Overview.svg
