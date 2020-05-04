@@ -1,4 +1,4 @@
-module go-workers-multipool
+module github.com/ericbrisrubio/go-workers-multipool
 
 go 1.13
 

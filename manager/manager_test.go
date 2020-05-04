@@ -4,8 +4,8 @@ import (
 	"bou.ke/monkey"
 	"fmt"
 	"github.com/enriquebris/goworkerpool"
+	"github.com/ericbrisrubio/go-workers-multipool/pool"
 	"github.com/pkg/errors"
-	"go-workers-multipool/pool"
 	"reflect"
 	"testing"
 )
