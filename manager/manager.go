@@ -26,6 +26,12 @@ func (manager *Manager) AddPool(poolID string, initialWorkers int, maxJobsInQueu
 	if manager.isPoolDefined(poolID) {
 		return errors.New(fmt.Sprintf("A pool with `%s` id already exist", poolID))
 	}
+	if manager.pools == nil {
+		manager.pools = make(map[string]pool.Descriptor)
+	}
+	if manager.poolsInitializer == nil {
+		manager.poolsInitializer = make(map[string]int)
+	}
 	manager.pools[poolID] = &pool.GoWorkerPoolAdapter{Pool: goworkerpool.NewPool(0, maxJobsInQueue, verbose)}
 	manager.poolsInitializer[poolID] = initialWorkers
 	return nil
