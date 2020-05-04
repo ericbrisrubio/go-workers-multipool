@@ -3,8 +3,8 @@ package manager
 import (
 	"fmt"
 	"github.com/enriquebris/goworkerpool"
+	"github.com/ericbrisrubio/go-workers-multipool/pool"
 	"github.com/pkg/errors"
-	"go-workers-multipool/pool"
 	"strings"
 	"sync"
 )
