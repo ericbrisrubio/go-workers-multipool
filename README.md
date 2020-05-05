@@ -83,7 +83,7 @@ func main() {
 	go func() {
 		for {
 			time.Sleep(time.Second*2)
-			poolsManager.AddTaskToPool("big-size", "{image-path} for big-size image")
+			poolsManager.AddTaskToPool("big-size", "{image-path} for big size image")
 		}
 	}()
 
