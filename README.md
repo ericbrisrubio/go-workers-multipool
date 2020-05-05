@@ -20,6 +20,10 @@ You can easily have many pools to execute different tasks and manage them separa
 
 ![system-overview](./go-workers-multipool-Overview.svg)
 
+### Class Diagram:
+
+![class-diagram](./go-workers-multipool-Class_Diagram.svg)
+
 ## Example Use Case:
 ### System to resize images
 
