@@ -38,7 +38,7 @@ we can cut them in half on the fly without affecting anything else and without r
 
 ### Quick Start: 
 
-```go get github.com/ericbrisrubio/go-workers-multipool@v0.1-alpha.2```
+```go get github.com/ericbrisrubio/go-workers-multipool@v0.1-alpha.3```
 
 #### Example code:
 
