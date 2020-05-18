@@ -11,10 +11,8 @@ import (
 )
 
 func TestManager_AddPool(t *testing.T) {
-	//type fields struct {
 	pools := make(map[string]pool.Descriptor, 1)
 	poolsInitializer := make(map[string]int, 1)
-	//}
 	type args struct {
 		poolID         string
 		initialWorkers int
