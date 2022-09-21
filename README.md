@@ -1,4 +1,4 @@
-[![DUMELS Diagram](https://www.dumels.com/api/v1/badge/ae644867-75b3-4652-b4c8-481c0145cef4)](https://www.dumels.com/diagram/ae644867-75b3-4652-b4c8-481c0145cef4)
+[![DUMELS Diagram](https://www.dumels.com/api/v1/badge/ae644867-75b3-4652-b4c8-481c0145cef4)](https://www.dumels.com/diagram/863b9974-0b2a-4e4a-8ce6-562162cd86a8)
 
 # go-workers-multipool
 Manager for multiple(unlimited) pools of workers in Golang.
